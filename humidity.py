@@ -1,5 +1,4 @@
 import RPi.GPIO as GPIO
-
 import DHT11
 
 # initialize GPIO

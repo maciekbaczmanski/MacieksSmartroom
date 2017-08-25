@@ -1,5 +1,4 @@
-from keys import api
-from keys import USRID
+from keys import api, USRID
 
 
 def msg(message):

@@ -1,29 +1,29 @@
 import threading
 import time
-
 import GUI
 import rawvalues as val
 from humidity import hum as humi
-from messaging import getmsg
-from messaging import msg
-from pins import initialisation
-from pins import pinout
-from pins import pinval as pin
-from temp import pressure
-from temp import temp
-
+from messaging import getmsg, msg
+from pins import initialisation, pinout, pinval as pin, event
+from temp import pressure, temp
+from counter import readin, readout
 GUI.initiali()
 initialisation()
 lightout = False
 pwr = False
 GUI.addlabel("nowy", "Welcome to MacieksRoom", "red", 0, 0, 4, 0)
 GUI.label40("nowy")
-GUI.addlabel2("temp", "stopni Celsjusza", 1, 0)
-GUI.addlabel2("hum", "stopni Celsjusza", 1, 1)
-GUI.addlabel3("pressure", "stopni Celsjusza", 2, 0, 4, 0)
-GUI.addlabel2("Doors", "Doors: Opened", 3, 0)
-GUI.addlabel2("Window", "Window: Opened", 3, 1)
+GUI.addlabel2("temp", "error", 1, 0)
+GUI.addlabel2("hum", "error", 1, 1)
+GUI.addlabel2("pressure", "error", 2, 0)
+GUI.addlabel2("people", "error", 2, 1)
+GUI.addlabel2("Doors", "error", 3, 0)
+GUI.addlabel2("Window", "error", 3, 1)
 humold = "nope"
+people = 1
+boolin = True
+boolout = True
+
 
 def lgt(btn):
     global lightout
@@ -71,16 +71,17 @@ msg("SYSTEM STARTED")
 
 
 def loop():
-    global lightout, humold, newhum
+    global lightout, humold, newhum, people
     while True:
         GUI.setlabel("temp", temp())
+        GUI.setlabel("people", people)
         humbool, hum = humi()
         if humbool:
             newhum = hum
         if humbool:
             GUI.setlabel("hum", hum)
         GUI.setlabel("pressure", pressure())
-        if pin(18):
+        if pin(18): #18
             GUI.setlabel("Doors", "Doors: Closed")
         else:
             GUI.setlabel("Doors", "Doors: Opened")
@@ -130,6 +131,10 @@ def loop5():
             pinout(22, False)
         time.sleep(6)
 
+def pplcounter():
+    global boolin, boolout
+    event(13,readin)
+    event(6, readout)
 
 
 t = threading.Thread(target=loop)
@@ -138,4 +143,7 @@ t.start()
 t2 = threading.Thread(target=loop5)
 t2.daemon = True
 t2.start()
+t3 = threading.Thread(target=pplcounter)
+t3.daemon = True
+t3.start()
 GUI.startgui()
